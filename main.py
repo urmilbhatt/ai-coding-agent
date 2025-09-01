@@ -9,6 +9,7 @@ def main():
     load_dotenv()
 
     args = sys.argv[1:]
+    verbose = '--verbose' in args
 
     if not args:
         print("AI Code Assistant")
@@ -25,16 +26,19 @@ def main():
         types.Content(role="user", parts=[types.Part(text=user_prompt)]),
     ]
 
-    generate_content(client, messages)
+    generate_content(client, messages, is_verbose=verbose)
 
 
-def generate_content(client, messages):
+def generate_content(client, messages, is_verbose=False):
     response = client.models.generate_content(
         model="gemini-2.0-flash-001",
         contents=messages,
     )
-    print("Prompt tokens:", response.usage_metadata.prompt_token_count)
-    print("Response tokens:", response.usage_metadata.candidates_token_count)
+    if is_verbose:
+        print("User prompt:", messages[0].parts[0].text)
+        print("Prompt tokens:", response.usage_metadata.prompt_token_count)
+        print("Response tokens:", response.usage_metadata.candidates_token_count)
+
     print("Response:")
     print(response.text)
 
